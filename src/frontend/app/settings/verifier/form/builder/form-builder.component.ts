@@ -44,6 +44,7 @@ export class FormBuilderComponent implements OnInit {
     creationMode            : boolean   = true;
     openAvailableField      : boolean   = false;
     modalOpen               : boolean   = false;
+    selectedFields          : any       = [];
     formId                  : any;
     formSettingId           : any;
     outputs                 : any[]     = [];
@@ -55,7 +56,7 @@ export class FormBuilderComponent implements OnInit {
             'control': new FormControl(),
         }
     };
-    formSettings           : any       = {
+    formSettings            : any       = {
         'allow_automatic_validation': {
             'control': new FormControl(),
         },
@@ -665,8 +666,8 @@ export class FormBuilderComponent implements OnInit {
         this.formId = this.route.snapshot.params['id'];
 
         this.http.get(environment['url'] + '/ws/outputs/list?module=verifier', {headers: this.authService.headers}).pipe(
-            tap((data: any) => {
-                this.outputs = data.outputs;
+            tap((res_outputs: any) => {
+                this.outputs = res_outputs.outputs;
                 if (this.formId) {
                     this.creationMode = false;
                     this.http.get(environment['url'] + '/ws/forms/getById/' + this.formId, {headers: this.authService.headers}).pipe(
@@ -974,6 +975,35 @@ export class FormBuilderComponent implements OnInit {
             if (!label && outputs.length === 0) this.notify.error(this.translate.instant('FORMS.label_and_output_mandatory'));
             else if (!label) this.notify.error(this.translate.instant('FORMS.label_mandatory'));
             else if (outputs.length === 0) this.notify.error(this.translate.instant('FORMS.output_type_mandatory'));
+        }
+    }
+
+    selectForLine(event: any, field: any) {
+        if (event.ctrlKey) {
+            field.lineSelected = !field.lineSelected;
+            if (field.lineSelected) {
+                this.selectedFields.push({'id': field.id, 'class': field.class});
+            } else {
+                this.selectedFields.forEach((element: any, index: number) => {
+                    if (element.id === field.id) {
+                        this.selectedFields.splice(index, 1);
+                        field.fullSize = false;
+                    }
+                });
+            }
+            let size = 0;
+            this.selectedFields.forEach((element: any) => {
+                const currentNumber = element.class.replace('w-', '');
+                if (currentNumber !== 'full') {
+                    const currentSize = new Function("return " + element.class.replace('w-', ''))();
+                    size += currentSize;
+                } else {
+                    size = 1;
+                }
+            });
+            if (Math.round((size * 10)) / 10 % 1 === 0 && field.lineSelected) {
+                field.fullSize = true;
+            }
         }
     }
 

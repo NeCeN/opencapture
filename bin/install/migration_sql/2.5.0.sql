@@ -52,6 +52,12 @@ INSERT INTO "regex" ("regex_id", "lang", "label", "content") VALUES ('splitter_c
 INSERT INTO "regex" ("regex_id", "lang", "label", "content") VALUES ('splitter_xml_comment', 'eng', 'Tech comments in Splitter XML output', '\s?<!--[\s\S\n]*?-->\s');
 INSERT INTO "regex" ("regex_id", "lang", "label", "content") VALUES ('splitter_empty_line', 'eng', 'Empty line in Splitter XML output', '^\s*$');
 
+-- Improve VAT Number REGEX
+UPDATE "regex" SET content = '(EU|SI|HU|D(K|E)|PL|CHE|(F|H)R|B(E|G)(0)?)[0-9A-Z]{2}[0-9]{6,9}' WHERE regex_id = 'vat_number';
+
+-- Improve EMAIL REGEX
+UPDATE "regex" SET content = '([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+' WHERE regex_id = 'email';
+
 -- Create tasks watcher
 create table tasks_watcher
 (
@@ -73,22 +79,22 @@ ALTER TABLE "form_models" DROP COLUMN automatic_validation_data;
 ALTER TABLE "form_models" DROP COLUMN metadata_method;
 ALTER TABLE "form_models" DROP COLUMN export_zip_file;
 ALTER TABLE "form_models" DROP COLUMN display;
-ALTER TABLE "form_models" ADD  COLUMN settings JSONB DEFAULT '{}';
+ALTER TABLE "form_models" ADD COLUMN settings JSONB DEFAULT '{}';
 
 CREATE TABLE "form_model_settings"
 (
-    "setting_id" SERIAL      UNIQUE PRIMARY KEY,
-    "module"     VARCHAR(10),
-    "settings"   JSONB       DEFAULT '{}'
+    "id"        SERIAL      UNIQUE PRIMARY KEY,
+    "module"    VARCHAR(10),
+    "settings"  JSONB       DEFAULT '{}'
 );
 
-INSERT INTO "form_model_settings" ("setting_id", "module", "settings") VALUES (1, 'verifier', '{
+INSERT INTO "form_model_settings" ("id", "module", "settings") VALUES (1, 'verifier', '{
     "display": {
         "subtitles": [
             {"id": "invoice_number", "label": "FACTURATION.invoice_number"},
             {"id": "invoice_date", "label": "FACTURATION.invoice_date"},
             {"id": "date", "label": "VERIFIER.register_date"},
-            {"id": "original_file", "label": "VERIFIER.original_file"},
+            {"id": "original_filename", "label": "VERIFIER.original_file"},
             {"id": "form_label", "label": "ACCOUNTS.form"}
         ]
     },
@@ -97,10 +103,61 @@ INSERT INTO "form_model_settings" ("setting_id", "module", "settings") VALUES (1
     "allow_automatic_validation": false,
     "delete_documents_after_outputs": false
 }');
-INSERT INTO "form_model_settings" ("setting_id", "module", "settings") VALUES (2, 'splitter', '{
+
+INSERT INTO "form_model_settings" ("id", "module", "settings") VALUES (2, 'splitter', '{
     "metadata_method": "",
     "export_zip_file": ""
 }');
 
-UPDATE form_models SET module_settings_id = 1 WHERE module = 'verifier';
-UPDATE form_models SET module_settings_id = 2 WHERE module = 'splitter';
+UPDATE form_models SET settings = '{
+    "display": {
+        "subtitles": [
+            {"id": "invoice_number", "label": "FACTURATION.invoice_number"},
+            {"id": "invoice_date", "label": "FACTURATION.invoice_date"},
+            {"id": "date", "label": "VERIFIER.register_date"},
+            {"id": "original_filename", "label": "VERIFIER.original_file"},
+            {"id": "form_label", "label": "ACCOUNTS.form"}
+        ]
+    },
+    "supplier_verif": false,
+    "automatic_validation_data": "",
+    "allow_automatic_validation": false,
+    "delete_documents_after_outputs": false
+}' WHERE module = 'verifier';
+
+UPDATE form_models SET settings = '{
+    "metadata_method": "",
+    "export_zip_file": ""
+}' WHERE module = 'splitter';
+
+-- Add Verifier PDF export
+INSERT INTO "outputs_types" ("output_type_id", "output_type_label", "module", "data") VALUES ('export_pdf', 'Export PDF', 'verifier', '{
+    "options": {
+        "auth": [],
+        "parameters": [
+            {
+                "id": "folder_out",
+                "type": "text",
+                "label": "Dossier de sortie",
+                "required": "true",
+                "placeholder": "/var/share/sortant"
+            },
+            {
+                "id": "separator",
+                "type": "text",
+                "label": "Séparateur",
+                "required": "true",
+                "placeholder": "_"
+            },
+            {
+                "id": "filename",
+                "hint": "Liste des identifiants techniques, séparés par #. Si l''identifiant technique n''existe pas, la valeur sera utilisée comme chaîne de caractères brut",
+                "type": "text",
+                "label": "Nom du fichier",
+                "required": "true",
+                "placeholder": "invoice_number#quotation_number#supplier_name"
+            }
+        ]
+    }
+}');
+

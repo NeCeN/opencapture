@@ -61,7 +61,7 @@ def add_form(args):
     form_id, error = forms.add_form(args)
     if form_id:
         if 'default_form' in args and args['default_form'] is True:
-            default_form, error = forms.get_default_form({})
+            default_form, error = forms.get_default_form_by_module({'module': args['module']})
             if not error and default_form['id'] != form_id:
                 forms.update_form({
                     'set': {'default_form': False},
@@ -106,10 +106,10 @@ def get_form_fields_by_supplier_id(supplier_id):
         if error is None:
             return form_info, 200
         else:
-            form_info = get_default_form()
+            form_info = get_default_form_by_module('verifier')
             return form_info[0], form_info[1]
     else:
-        return get_default_form()
+        return get_default_form_by_module('verifier')
 
 
 def get_form_fields_by_form_id(form_id):
@@ -127,8 +127,8 @@ def get_form_fields_by_form_id(form_id):
         return response, 401
 
 
-def get_default_form():
-    form_id, error = forms.get_default_form({'select': ['id']})
+def get_default_form_by_module(module):
+    form_id, error = forms.get_default_form_by_module({'select': ['id'], 'module': module})
     if error is None:
         form_info, error = forms.get_fields({
             'form_id': form_id['id']
@@ -149,7 +149,7 @@ def update_form(form_id, args):
     if error is None:
         # Remove previous default form is the updated one is set to default
         if 'default_form' in args and args['default_form'] is True:
-            default_form, error = forms.get_default_form({})
+            default_form, error = forms.get_default_form_by_module({'module': form['module']})
             if not error and default_form['id'] != form_id:
                 forms.update_form({'set': {'default_form': False}, 'form_id': default_form['id']})
 
@@ -158,8 +158,9 @@ def update_form(form_id, args):
             try:
                 if type(args['settings'][setting]) is bool:
                     forms.update_form({'set': {'settings': "jsonb_set(settings, '{" + setting + "}', '" + str(args['settings'][setting]).lower() + "')"}, 'form_id': form_id})
-                elif args['settings'][setting] and type(eval(args['settings'][setting])) is dict:
-                    forms.update_form({'set': {'settings': "jsonb_set(settings, '{" + setting + "}', '" + str(args['settings'][setting]) + "')"}, 'form_id': form_id})
+                elif args['settings'][setting] and type(args['settings'][setting]) is dict:
+                    settings_data = json.dumps(args['settings'][setting]).replace("'", "''")
+                    forms.update_form({'set': {'settings': "jsonb_set(settings, '{" + setting + "}', '" + settings_data + "')"}, 'form_id': form_id})
                 else:
                     forms.update_form({'set': {'settings': "jsonb_set(settings, '{" + setting + "}', '\"" + str(args['settings'][setting]) + "\"')"}, 'form_id': form_id})
             except Exception:
@@ -167,7 +168,8 @@ def update_form(form_id, args):
 
         # Update form other database columns
         del args['settings']
-        res, error = forms.update_form({'set': args, 'form_id': form_id})
+        if args:
+            res, error = forms.update_form({'set': args, 'form_id': form_id})
 
         if error is None:
             return '', 200
@@ -184,36 +186,6 @@ def update_form(form_id, args):
             "message": error
         }
     return response, 401
-
-
-def update_form_settings(data, form_id):
-    _, error = forms.get_form_by_id({'form_id': form_id})
-    if error is None:
-        for setting in data:
-            try:
-                if type(data[setting]) is bool:
-                    forms.update_form({'set': {'settings': "jsonb_set(settings, '{" + setting + "}', '" + str(data[setting]).lower() + "')"}, 'form_id': form_id})
-                elif data[setting] and type(eval(data[setting])) is dict:
-                    forms.update_form({'set': {'settings': "jsonb_set(settings, '{" + setting + "}', '" + str(data[setting]) + "')"}, 'form_id': form_id})
-                else:
-                    forms.update_form({'set': {'settings': "jsonb_set(settings, '{" + setting + "}', '\"" + str(data[setting]) + "\"')"}, 'form_id': form_id})
-            except Exception:
-                forms.update_form({'set': {'settings': "jsonb_set(settings, '{" + setting + "}', '\"" + str(data[setting]) + "\"')"}, 'form_id': form_id})
-
-        if error is None:
-            return '', 200
-        else:
-            response = {
-                "errors": gettext('UPDATE_FORMS_FIELDS_ERROR'),
-                "message": error
-            }
-            return response, 401
-    else:
-        response = {
-            "errors": gettext('UPDATE_FORMS_FIELDS_ERROR'),
-            "message": error
-        }
-        return response, 401
 
 
 def delete_form(form_id):
@@ -245,7 +217,7 @@ def duplicate_form(form_id):
             'default_form': False,
             'outputs': form_info['outputs'],
             'module': form_info['module'],
-            'supplier_verif': form_info['supplier_verif']
+            'settings': json.dumps(form_info['settings'])
         }
         res, error = forms.add_form(args)
         if error is None:

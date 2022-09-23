@@ -31,13 +31,12 @@ import { DomSanitizer } from "@angular/platform-browser";
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from "@angular/cdk/drag-drop";
 import { MatDialog } from "@angular/material/dialog";
 import { DocumentTypeComponent } from "../document-type/document-type.component";
-import {remove } from 'remove-accents';
+import { remove } from 'remove-accents';
 import { HistoryService } from "../../../services/history.service";
 import { ConfirmDialogComponent } from "../../../services/confirm-dialog/confirm-dialog.component";
-import {marker} from "@biesbjerg/ngx-translate-extract-marker";
-import { formatDate } from '@angular/common';
+import { marker} from "@biesbjerg/ngx-translate-extract-marker";
 import * as moment from "moment";
-import {LocaleService} from "../../../services/locale.service";
+import { LocaleService } from "../../../services/locale.service";
 
 export interface Field {
     id              : number
@@ -651,7 +650,7 @@ export class SplitterViewerComponent implements OnInit, OnDestroy {
 
     getFormFieldsValues() {
         for (const field of this.fieldsCategories['batch_metadata']) {
-            if (this.batchForm.get(field.label_short) && !this.batchMetadataValues.hasOwnProperty(field.label_short)) {
+            if (this.batchForm.get(field.label_short)) {
                 this.batchMetadataValues[field.label_short] = this.batchForm.get(field.label_short)?.value;
                 if (field.type === 'date') {
                     this.batchMetadataValues[field.label_short] = moment(this.batchMetadataValues[field.label_short]).format('L');

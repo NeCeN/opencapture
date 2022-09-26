@@ -161,3 +161,24 @@ INSERT INTO "outputs_types" ("output_type_id", "output_type_label", "module", "d
     }
 }');
 
+CREATE TABLE ai_models
+(
+    "id"                    SERIAL       PRIMARY KEY,
+    "model_path"            VARCHAR(50),
+    "train_time"            REAL,
+    "type"                  VARCHAR(15),
+    "accuracy_score"        REAL,
+    "doc_types"             TEXT,
+    "status"                VARCHAR(10)   DEFAULT 'OK',
+    "target"                TEXT,
+    "min_proba"             INTEGER,
+);
+
+INSERT INTO "docservers"("description", "docserver_id", "path")
+VALUES ('Chemin vers le dossier contenant les données d''entraînement', 'TRAIN_PATH_FILES', '/var/www/html/opencapture/bin/scripts/artificial_intelligence/train_data');
+
+INSERT INTO "docservers"("description", "docserver_id", "path")
+VALUES ('Chemin vers le dossier contenant le fichier csv utilisé pour l''apprentissage', 'TRAIN_CSV_PATH', '/var/www/html/opencapture/bin/scripts/artificial_intelligence/train_data/data.csv');
+
+INSERT INTO "docservers"("description", "docserver_id", "path")
+VALUES ('Chemin vers le dossier contenant le modèle de prédiction', 'AI_MODEL_PATH', '/var/www/html/opencapture/bin/scripts/artificial_intelligence/models/');

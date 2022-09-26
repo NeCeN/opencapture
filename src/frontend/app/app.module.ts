@@ -95,6 +95,9 @@ import { SplitterCreateOutputComponent } from './settings/splitter/output/create
 import { SplitterOutputListComponent } from './settings/splitter/output/list/output-list.component';
 import { SplitterFormBuilderComponent } from './settings/splitter/form/builder/form-builder.component';
 import { SplitterFormListComponent } from './settings/splitter/form/list/form-list.component';
+import { ArtificialIntelligenceComponent} from "./settings/splitter/artificial-intelligence/artificial-intelligence.component";
+import { CreateModelComponent } from "./settings/splitter/artificial-intelligence/create/create-model.component";
+import { UpdateModelComponent} from "./settings/splitter/artificial-intelligence/update/update-model.component";
 import { StatisticsComponent } from './statistics/statistics.component';
 import { CreateDocTypeComponent } from './settings/splitter/doc-types/create/create-doc-type.component';
 import { ListDocTypeComponent } from './settings/splitter/doc-types/list/list-doc-type.component';
@@ -167,6 +170,9 @@ export function createTranslateLoader(http: HttpClient) {
         SplitterUpdateOutputComponent,
         SplitterCreateOutputComponent,
         SplitterOutputListComponent,
+        ArtificialIntelligenceComponent,
+        CreateModelComponent,
+        UpdateModelComponent,
         HistoryComponent,
         StatisticsComponent,
         CreateDocTypeComponent,

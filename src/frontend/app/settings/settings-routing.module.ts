@@ -57,6 +57,9 @@ import { UpdatePositionsMaskComponent } from "./verifier/positions-mask/update/u
 import { CreateFolderDocTypeComponent } from "./splitter/doc-types/create-folder/create-folder-doc-type.component";
 import { LoginMethodsComponent } from "./general/login-methods/login-methods.component";
 import { VerifierDisplayComponent } from "./verifier/display/display.component";
+import {ArtificialIntelligenceComponent} from "./splitter/artificial-intelligence/artificial-intelligence.component";
+import { CreateModelComponent } from "./splitter/artificial-intelligence/create/create-model.component";
+import { UpdateModelComponent } from "./splitter/artificial-intelligence/update/update-model.component";
 
 const routes: Routes = [
     {
@@ -268,6 +271,21 @@ const routes: Routes = [
     {
         path: 'settings/splitter/inputs/update/:id', component: SplitterUpdateInputComponent,
         data: {title: 'SETTINGS.update_input', privileges: ['settings', 'update_input_splitter']},
+        canActivate: [LoginRequiredService, HasPrivilegeService]
+    },
+    {
+        path: 'settings/splitter/artificial-intelligence', component: ArtificialIntelligenceComponent,
+        data: {title: 'SETTINGS.artificial_intelligence', privileges: ['settings', 'add_input_splitter']},
+        canActivate: [LoginRequiredService, HasPrivilegeService]
+    },
+    {
+        path: 'settings/splitter/artificial-intelligence/create', component: CreateModelComponent,
+        data: {title: 'ARTIFICIAL-INTELLIGENCE.add_model', privileges: ['settings', 'add_input_splitter']},
+        canActivate: [LoginRequiredService, HasPrivilegeService]
+    },
+    {
+        path: 'settings/splitter/artificial-intelligence/update/:id', component: UpdateModelComponent,
+        data: {title: 'ARTIFICIAL-INTELLIGENCE.update_model', privileges: ['settings', 'add_input_splitter']},
         canActivate: [LoginRequiredService, HasPrivilegeService]
     },
 // -- END Splitter

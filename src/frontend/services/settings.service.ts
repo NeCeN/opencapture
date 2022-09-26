@@ -361,6 +361,30 @@ export class SettingsService {
                     }
                 ]
             },
+            {
+                "id": "artificial-intelligence",
+                "label": this.translate.instant("SETTINGS.artificial_intelligence"),
+                "icon": "fa-solid fa-microchip",
+                "route": "/settings/splitter/artificial-intelligence/",
+                "privilege": "artificial_intelligence_splitter",
+                "actions"   : [
+                    {
+                        "id"        : "splitter_add_model",
+                        "label"     : this.translate.instant("ARTIFICIAL-INTELLIGENCE.add_model"),
+                        "route"     : "/settings/splitter/artificial-intelligence/create",
+                        "privilege" : "add_model",
+                        "icon"      : "fa-solid fa-plus"
+                    },
+                    {
+                        "id"                : "splitter_update_model",
+                        "label"             : this.translate.instant("ARTIFICIAL-INTELLIGENCE.update_model"),
+                        "route"             : "/settings/splitter/artificial-intelligence/update/",
+                        "privilege"         : "update_model_splitter",
+                        "icon"              : "fa-solid fa-edit",
+                        "showOnlyIfActive"  : true
+                    }
+                ]
+            }
         ]
     };
 

@@ -28,3 +28,5 @@ pytesseract==0.3.10
 pyexcel_ods3==0.6.1
 configparser==5.2.0
 opencv-python==4.6.0.66
+scikit-learn==1.1.2
+nltk==3.7

@@ -109,6 +109,11 @@ if 'doctypes' or 'controllers' not in custom_array['doctypes']['path']:
 elif 'controllers' in custom_array['doctypes']['path']:
     inputs = getattr(__import__(custom_array['doctypes']['path'], fromlist=[custom_array['doctypes']['module']]), custom_array['doctypes']['module'])
 
+if 'artificial_intelligence' or 'controllers' not in custom_array['artificial_intelligence']['path']:
+    from .controllers import doctypes
+elif 'controllers' in custom_array['artificial_intelligence']['path']:
+    inputs = getattr(__import__(custom_array['artificial_intelligence']['path'], fromlist=[custom_array['artificial_intelligence']['module']]), custom_array['artificial_intelligence']['module'])
+
 if 'tasks_watcher' or 'controllers' not in custom_array['tasks_watcher']['path']:
     from .controllers import tasks_watcher
 elif 'controllers' in custom_array['tasks_watcher']['path']:

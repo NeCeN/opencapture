@@ -135,6 +135,12 @@ elif 'rest' in custom_array['doctypes']['path']:
     doctypes = getattr(__import__(custom_array['doctypes']['path'], fromlist=[custom_array['doctypes']['module']]),
                      custom_array['doctypes']['module'])
 
+if 'artificial_intelligence' not in custom_array or 'rest' not in custom_array['artificial_intelligence']['path']:
+    from .rest import artificial_intelligence
+elif 'rest' in custom_array['artificial_intelligence']['path']:
+    artificial_intelligence = getattr(__import__(custom_array['artificial_intelligence']['path'], fromlist=[custom_array['artificial_intelligence']['module']]),
+                                      custom_array['artificial_intelligence']['module'])
+
 if 'tasks_watcher' not in custom_array or 'rest' not in custom_array['tasks_watcher']['path']:
     from .rest import tasks_watcher
 elif 'rest' in custom_array['tasks_watcher']['path']:

@@ -57,7 +57,7 @@ import { UpdatePositionsMaskComponent } from "./verifier/positions-mask/update/u
 import { CreateFolderDocTypeComponent } from "./splitter/doc-types/create-folder/create-folder-doc-type.component";
 import { LoginMethodsComponent } from "./general/login-methods/login-methods.component";
 import { VerifierDisplayComponent } from "./verifier/display/display.component";
-import {ArtificialIntelligenceComponent} from "./splitter/artificial-intelligence/artificial-intelligence.component";
+import {ArtificialIntelligenceComponent} from "./splitter/artificial-intelligence/list/artificial-intelligence.component";
 import { CreateModelComponent } from "./splitter/artificial-intelligence/create/create-model.component";
 import { UpdateModelComponent } from "./splitter/artificial-intelligence/update/update-model.component";
 

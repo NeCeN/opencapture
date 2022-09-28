@@ -3,18 +3,18 @@ import {HttpClient} from "@angular/common/http";
 import {MatDialog} from '@angular/material/dialog';
 import {ActivatedRoute, Router} from "@angular/router";
 import {FormBuilder, FormGroup} from "@angular/forms";
-import {AuthService} from "../../../../services/auth.service";
-import {UserService} from "../../../../services/user.service";
+import {AuthService} from "../../../../../services/auth.service";
+import {UserService} from "../../../../../services/user.service";
 import {TranslateService} from "@ngx-translate/core";
-import {NotificationService} from "../../../../services/notifications/notifications.service";
-import {SettingsService} from "../../../../services/settings.service";
-import {PrivilegesService} from "../../../../services/privileges.service";
-import {environment} from "../../../env";
+import {NotificationService} from "../../../../../services/notifications/notifications.service";
+import {SettingsService} from "../../../../../services/settings.service";
+import {PrivilegesService} from "../../../../../services/privileges.service";
+import {environment} from "../../../../env";
 import {catchError, of, tap} from "rxjs";
 import { Sort } from "@angular/material/sort";
 import {finalize} from "rxjs/operators";
-import {ConfirmDialogComponent} from "../../../../services/confirm-dialog/confirm-dialog.component";
-import {HistoryService} from "../../../../services/history.service";
+import {ConfirmDialogComponent} from "../../../../../services/confirm-dialog/confirm-dialog.component";
+import {HistoryService} from "../../../../../services/history.service";
 
 @Component({
   selector: 'app-artificial-intelligence',
@@ -33,7 +33,6 @@ export class ArtificialIntelligenceComponent implements OnInit {
     pageSize        : number        = 10;
     pageIndex       : number        = 0;
     total           : number        = 0;
-    docStatus : any = [];
     clickedRow: object = {};
     uploadForm!: FormGroup;
     prediction : any = [];

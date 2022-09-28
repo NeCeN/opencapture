@@ -36,6 +36,7 @@ export class CreateModelComponent implements OnInit {
         {
             id: 'model_label',
             label: this.translate.instant("ARTIFICIAL-INTELLIGENCE.model_name"),
+            placeholder: "exemple_modèle.sav",
             type: 'text',
             control: new FormControl('', Validators.pattern("[a-zA-Z0-9+._-éùà)(î]+\\.sav+")),
             required: true,

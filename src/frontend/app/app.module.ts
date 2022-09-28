@@ -95,7 +95,7 @@ import { SplitterCreateOutputComponent } from './settings/splitter/output/create
 import { SplitterOutputListComponent } from './settings/splitter/output/list/output-list.component';
 import { SplitterFormBuilderComponent } from './settings/splitter/form/builder/form-builder.component';
 import { SplitterFormListComponent } from './settings/splitter/form/list/form-list.component';
-import { ArtificialIntelligenceComponent} from "./settings/splitter/artificial-intelligence/artificial-intelligence.component";
+import { ArtificialIntelligenceComponent} from "./settings/splitter/artificial-intelligence/list/artificial-intelligence.component";
 import { CreateModelComponent } from "./settings/splitter/artificial-intelligence/create/create-model.component";
 import { UpdateModelComponent} from "./settings/splitter/artificial-intelligence/update/update-model.component";
 import { StatisticsComponent } from './statistics/statistics.component';

@@ -24,7 +24,6 @@ from flask import request
 from sklearn import feature_extraction, model_selection, naive_bayes, pipeline, metrics
 import os
 from src.backend import create_classes_from_custom_id, retrieve_custom_from_url
-from pdf2image import convert_from_path
 import csv
 from nltk import word_tokenize
 from nltk.corpus import stopwords
@@ -107,31 +106,23 @@ def launch_train(data, model_name):
 
     folders = []
     target = []
-    target_list = []
-    if len(data) == 1:
-        for folder in data["docs"]:
-            folders.append(folder)
-        folders_list = ", ".join(folders)
-        min_pred = None
 
-    else:
-        for element in data["docs"]:
-            folders.append(element["folder"])
-            target.append(element["doctype"])
-        min_pred = data["min_pred"]
-        folders_list = ", ".join(folders)
-        target_list = ", ".join(target)
+    for element in data["docs"]:
+        folders.append(element["folder"])
+        target.append(element["doctype"])
+    min_pred = data["min_pred"]
+    folders_list = ", ".join(folders)
+    target_list = ", ".join(target)
 
     path = _doc_servers.get('TRAIN_PATH_FILES')
     csv_file = _doc_servers.get('TRAIN_CSV_PATH')
     model_name = _doc_servers.get('AI_MODEL_PATH') + model_name
-    files_to_use = folders_list
     start_time = time.time()
 
     args = {'model_path': model_name.split("/")[-1],
             'type': 'doctype',
             'status': 'training',
-            'doc_types': files_to_use,
+            'doc_types': folders_list,
             }
     model_id = create_model(args)[0].get('id')
 
@@ -139,7 +130,6 @@ def launch_train(data, model_name):
     print("--- ocr time: %s seconds ---" % (time.time() - start_time))
 
     launch_train_model(model_name, csv_file, model_id)
-
     t2 = round(time.time() - start_time, 0)
 
     args = {'set': {
@@ -272,25 +262,7 @@ def add_train_text_to_csv(file_path, csv_file, chosen_files, model_id):
     create_csv(csv_file)
     add_to_csv(csv_file, rows)
     msg = "Text extraction complete"
-
     _log.info(msg)
-
-
-def convert_pdf_dir_to_images(pdfs_path):
-    """
-    Conversion of all pdf in a given folder to jpg images
-    :param pdfs_path: path of the folder containing pdf we need to convert
-    :return: N/A
-    """
-    for file_name in os.listdir(pdfs_path + "/"):
-        if not file_name.lower().endswith(".pdf"):
-            continue
-        if file_name.endswith('.pdf'):
-            convert_from_path(pdfs_path + "/" + file_name, output_folder=pdfs_path, dpi=300, fmt='jpeg', jpegopt={
-                "quality": 100,
-                "progressive": True,
-                "optimize": True
-            }, single_file=True, output_file=file_name.split(".")[0])
 
 
 def add_to_csv(csv_file, data_list):
@@ -365,19 +337,16 @@ def launch_pred(mname, data):
     _files = _vars[3]
 
     file_to_save = _files.normalize(data.filename)
-    data_directory = "/home/edissyum/Documents/web"
-    path = data_directory + "/" + file_to_save
+
+    path = _docservers.get('TMP_PATH') + file_to_save
     data.save(path)
 
-    tmp_path = _docservers.get('AI_MODEL_PATH') + mname
-    model_name = tmp_path
-    file = data_directory
+    model_name = _docservers.get('AI_MODEL_PATH') + mname
+
     if os.path.exists(model_name):
         csv_file = _docservers.get('TRAIN_CSV_PATH')
-        store_one_file(file, csv_file)
+        store_one_file(path, csv_file)
 
-        if os.path.exists(path):
-            os.remove(path)
         return model_testing(model_name, csv_file)
 
     else:
@@ -419,20 +388,20 @@ def store_one_file(file_path, csv_file):
     _log = _vars[5]
     _doc_servers = _vars[9]
     rows = []
-    image_format = [".png", ".jpeg", ".jpg", ".jpe", ".webp", ".tiff", ".tif", ".bmp"]
 
-    convert_pdf_dir_to_images(file_path)
-    for file_name in os.listdir(file_path + "/"):
-        if file_name.lower().endswith(tuple(image_format)):
-            filtered_image = _files.adjust_image(file_path + "/" + file_name)
-            text = _ocr.text_builder(filtered_image)
-            clean_words = word_cleaning(text)
-            text_stem = stemming(clean_words)
-            line = [file_name, text_stem]
-            rows.append(line)
-            os.remove(file_path + "/" + file_name)
-        else:
-            continue
+    _files.jpg_name = _doc_servers.get('TMP_PATH') + Path(_files.normalize(file_path)).stem + '.jpg'
+    _files.pdf_to_jpg(file_path, open_img=False)
+    if os.path.exists(_files.jpg_name):
+        filtered_image = _files.adjust_image(_files.jpg_name)
+    else:
+        _files.jpg_name = _doc_servers.get('TMP_PATH') + Path(_files.jpg_name).stem + '-1.jpg'
+        filtered_image = _files.adjust_image(_files.jpg_name)
+    text = _ocr.text_builder(filtered_image)
+    clean_words = word_cleaning(text)
+    text_stem = stemming(clean_words)
+    line = [os.path.basename(file_path), text_stem]
+    rows.append(line)
+
     create_csv(csv_file)
     add_to_csv(csv_file, rows)
 

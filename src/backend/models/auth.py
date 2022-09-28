@@ -15,7 +15,7 @@
 
 # @dev : Nathan Cheval <nathan.cheval@outlook.fr>
 # @dev : Essaid MEGHELLET <essaid.meghellet@edissyum.com>
-
+# je suis un exemple
 import json
 from flask import request, session
 from flask_babel import gettext

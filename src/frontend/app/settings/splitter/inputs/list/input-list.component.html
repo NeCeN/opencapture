@@ -101,6 +101,10 @@
             <mat-header-cell mat-sort-header *matHeaderCellDef> {{ 'INPUT.input_folder_header' | translate }} </mat-header-cell>
             <mat-cell *matCellDef="let element"> {{ element.input_folder }} </mat-cell>
         </ng-container>
+            <ng-container matColumnDef="ai_model">
+                <mat-header-cell *matHeaderCellDef> {{ 'ARTIFICIAL-INTELLIGENCE.model_path' | translate }} </mat-header-cell>
+                <mat-cell *matCellDef="let element"> {{ element.ai_model }} </mat-cell>
+            </ng-container>
         <ng-container matColumnDef="actions">
             <mat-header-cell *matHeaderCellDef> </mat-header-cell>
             <mat-cell *matCellDef="let element">

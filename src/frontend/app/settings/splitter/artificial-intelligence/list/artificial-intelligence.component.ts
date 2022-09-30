@@ -28,7 +28,7 @@ export class ArtificialIntelligenceComponent implements OnInit {
     showResponse      : boolean = false;
     DocToPredSelected : boolean = true;
     isPredicting      : boolean = false;
-    displayedColumns: string[] = ['id', 'model_path', 'train_time', 'type','accuracy_score','doc_types', 'min_proba', 'actions'];
+    displayedColumns: string[] = ['id', 'model_path', 'train_time', 'type','accuracy_score','documents', 'min_proba', 'actions'];
     offset          : number        = 0;
     pageSize        : number        = 10;
     pageIndex       : number        = 0;
@@ -63,6 +63,17 @@ export class ArtificialIntelligenceComponent implements OnInit {
         this.http.get(environment['url'] + '/ws/artificial_intelligence/getAIModels', {headers: this.authService.headers}).pipe(
             tap((data: any) => {
                 this.modelsList = data.models;
+                for (let i = 0; i < this.modelsList.length; i++)
+                {
+                    let tmp_doc = "";
+                    for (let j = 0; j < this.modelsList[i].documents.length; j++){
+                        tmp_doc += this.modelsList[i].documents[j].folder+", ";
+                        if(j === this.modelsList[i].documents.length-1){
+                            tmp_doc = tmp_doc.slice(0, -2);
+                        }
+                    }
+                    this.modelsList[i].documents = [tmp_doc];
+                }
                 this.total = this.modelsList.length;
                 if (offset !== undefined && size!== undefined) {
                     this.modelsList = this.modelsList.slice(offset, offset+size);

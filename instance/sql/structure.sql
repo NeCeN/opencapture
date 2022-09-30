@@ -380,5 +380,17 @@ CREATE TABLE mailcollect (
      "verifier_form_id"              INTEGER
 );
 
+CREATE TABLE ai_models
+(
+    "id"                            SERIAL       PRIMARY KEY,
+    "model_path"                    VARCHAR(50),
+    "train_time"                    REAL,
+    "type"                          VARCHAR(15),
+    "accuracy_score"                REAL,
+    "status"                        VARCHAR(10)   DEFAULT 'OK',
+    "min_proba"                     INTEGER,
+    "documents"                     JSONB       DEFAULT '{}'
+);
+
 CREATE SEQUENCE splitter_referential_call_count AS INTEGER;
 COMMENT ON SEQUENCE splitter_referential_call_count IS 'Splitter referential demand number count';

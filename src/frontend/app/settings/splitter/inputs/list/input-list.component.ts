@@ -42,7 +42,7 @@ import { HistoryService } from "../../../../../services/history.service";
 })
 export class SplitterInputListComponent implements OnInit {
     headers         : HttpHeaders   = this.authService.headers;
-    columnsToDisplay: string[]      = ['id', 'input_id', 'input_label', 'input_folder', 'actions'];
+    columnsToDisplay: string[]      = ['id', 'input_id', 'input_label', 'input_folder', 'ai_model', 'actions'];
     loading         : boolean       = true;
     inputs          : any           = [];
     pageSize        : number        = 10;

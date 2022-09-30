@@ -62,7 +62,7 @@ def train_model(model_name):
 def update_model(model_id):
     data = json.loads(request.data)
     args = {'set': {'model_path': data["var1"], 'min_proba': data["var2"],
-                    'target': artificial_intelligence.split_data(data["var3"])}, 'model_id': model_id}
+                    'documents': json.dumps(data["var3"])}, 'model_id': model_id}
     artificial_intelligence.rename_model(data["var1"], model_id)
     res = artificial_intelligence.update_model(args)
     return make_response(jsonify(res)), 200

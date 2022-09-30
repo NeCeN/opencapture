@@ -168,10 +168,9 @@ CREATE TABLE ai_models
     "train_time"            REAL,
     "type"                  VARCHAR(15),
     "accuracy_score"        REAL,
-    "doc_types"             TEXT,
     "status"                VARCHAR(10)   DEFAULT 'OK',
-    "target"                TEXT,
     "min_proba"             INTEGER,
+    "documents"             JSONB       DEFAULT '{}'
 );
 
 INSERT INTO "docservers"("description", "docserver_id", "path")

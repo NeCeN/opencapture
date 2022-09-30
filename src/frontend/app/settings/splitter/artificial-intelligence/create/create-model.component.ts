@@ -32,7 +32,7 @@ export class CreateModelComponent implements OnInit {
     forms : any =[];
     chosenForm:any=[];
     chosenDocs:any=[];
-    outputForm          : any[]         = [
+    modelForm          : any[]         = [
         {
             id: 'model_label',
             label: this.translate.instant("ARTIFICIAL-INTELLIGENCE.model_name"),
@@ -79,7 +79,7 @@ export class CreateModelComponent implements OnInit {
                 this.docs = data;
                 this.docStatus.splice(0);
                 for (const element of this.docs){
-                    this.docStatus.push({doc:element, isSelected:false, linked_type:""});
+                    this.docStatus.push({doc:element, isSelected:false, linked_doctype:"", linked_form:""});
                     this.formControls.push(new FormControl(''));
                     this.formForm.push(new FormControl('',[Validators.required]));
                 }
@@ -148,34 +148,36 @@ export class CreateModelComponent implements OnInit {
     changeOutputType(event: any, doc: string) {
         const val = event.value;
         const match = this.docStatus.find((a: { doc: string }) => a.doc === doc);
-        match.linked_type = val;
+        match.linked_doctype = val;
         return true;
     }
 
     onFormSelect(event: any, index: number, doc: string){
         const val = event.value;
         for (const element of this.forms) {
-            if (element.label === val) {
+            if (element.id === val) {
                 this.chosenForm[index]=element.id;
                 this.chosenDocs[index]=this.doc_types.filter((a: { formId: number }) => a.formId === this.chosenForm[index]);
             }
         }
-        this.formControls[index].value = this.chosenDocs[index][0].label;
+        this.formControls[index].value = this.chosenDocs[index][0].id;
         const match = this.docStatus.find((a: { doc: string }) => a.doc === doc);
-        match.linked_type = this.chosenDocs[index][0].label;
+        match.linked_doctype = this.chosenDocs[index][0].id;
+        match.linked_form = this.chosenForm[index];
     }
 
-    createOutput() {
+    createModel() {
         let start_training = true;
-        if (this.isValidForm(this.outputForm) && this.totalChecked > 1 && this.isValidForm2(this.formControls)) {
-            const model_name = this.getValueFromForm(this.outputForm, 'model_label');
-            const min_pred = this.getValueFromForm(this.outputForm, 'model_stop');
+        if (this.isValidForm(this.modelForm) && this.totalChecked > 1 && this.isValidForm2(this.formControls)) {
+            const model_name = this.getValueFromForm(this.modelForm, 'model_label');
+            const min_pred = this.getValueFromForm(this.modelForm, 'model_stop');
             const doctypes = [];
             const matches = this.docStatus.filter((a: { isSelected: boolean }) => a.isSelected);
             for (let i = 0; i < this.totalChecked; i = i + 1) {
                 const fold = matches[i].doc;
-                const oc_target = matches[i].linked_type;
-                doctypes.push({folder:fold, doctype:oc_target});
+                const oc_target = matches[i].linked_doctype;
+                const formid = matches[i].linked_form;
+                doctypes.push({folder:fold, doctype:oc_target, form:formid});
             }
 
             for (const element of this.listModels) {

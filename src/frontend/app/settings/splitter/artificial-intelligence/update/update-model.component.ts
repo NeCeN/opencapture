@@ -25,12 +25,20 @@ export class UpdateModelComponent implements OnInit {
     doc_types : any = [];
     forms : any = [];
     formById : any = [];
-    outputForm          : any[]         = [
+    doctypesFormControl : any = [];
+    formsFormControl : any = [];
+    tableData : any = [];
+    displayedColumns: string[] = ['Documents','Formulaires','Doctypes'];
+    chosenForm : any = [];
+    chosenDocs : any = [];
+    documents : any = [];
+    len: number = 0;
+    modelForm          : any[]         = [
         {
             id: 'model_path',
             label: this.translate.instant("ARTIFICIAL-INTELLIGENCE.model_name"),
             type: 'text',
-            control: new FormControl('', Validators.pattern("[a-zA-Z0-9+._-éùàî]+\\.sav+")),
+            control: new FormControl('', Validators.pattern("[a-zA-Z0-9+._-éùà)(î]+\\.sav+")),
             required: true,
         }, {
             id: 'min_proba',
@@ -40,15 +48,6 @@ export class UpdateModelComponent implements OnInit {
             required: true,
         },
     ];
-    dtypes!: string;
-    dtarget! : string;
-    doctypesFormControl : any = [];
-    formsFormControl : any = [];
-    tableData : any = [];
-    displayedColumns: string[] = ['Documents','Formulaires','Doctypes'];
-    chosenForm : any = [];
-    chosenDocs : any = [];
-
     constructor(
         public router: Router,
         private http: HttpClient,
@@ -69,27 +68,26 @@ export class UpdateModelComponent implements OnInit {
         await this.retrieveForms();
         this.http.get(environment['url'] + '/ws/artificial_intelligence/getById/' + this.modelId, {headers: this.authService.headers}).pipe(
             tap((data: any) => {
-                this.dtypes = data.doc_types;
-                this.dtarget = data.target;
-                const targets = this.dtarget.split(', ');
+                this.documents=data.documents;
                 const selectedFormId : any = [];
-                const len = targets.length;
-                for(let i=0; i < len; i++) {
+                this.len = this.documents.length;
+                for(let i=0; i < this.len; i++) {
                     for (const element of this.doc_types){
-                        if (element.label === targets[i]){
+                        if (element.id === this.documents[i].doctype){
                             selectedFormId.push(element.formId);
                             break;
                         }
                     }
-                    this.formById.push( (this.forms.find((a: { id: number }) => a.id === selectedFormId[i])).label );
+                    // Même moi j'ai pas compris ce que j'ai fait
+                    this.formById.push( (this.forms.find((a: { id: number }) => a.id === selectedFormId[i])).id );
                     this.chosenDocs[i]=this.doc_types.filter((a: { formId: number }) => a.formId === selectedFormId[i]);
-                    this.doctypesFormControl.push(new FormControl(targets[i], [Validators.required]));
+                    this.doctypesFormControl.push(new FormControl(this.documents[i].doctype, [Validators.required]));
                     this.formsFormControl.push(new FormControl(this.formById[i], [Validators.required]));
-                    this.tableData.push({Documents:this.dtypes.split(', ')[i], Doctypes:targets[i],Formulaires: this.formById[i], id: i});
+                    this.tableData.push({Documents:this.documents[i].folder, Doctypes:this.documents[i].doctype,Formulaires: this.formById[i], id: i});
                   }
                 for (const field in data) {
                     if (data.hasOwnProperty(field)) {
-                        this.outputForm.forEach(element => {
+                        this.modelForm.forEach(element => {
                             if (element.id === field) {
                                 element.control.setValue(data[field]);
                                 if (element.id === 'compress_type')
@@ -111,13 +109,18 @@ export class UpdateModelComponent implements OnInit {
     }
 
     updateModel() {
-        if (this.isValidForm(this.outputForm)) {
-            const model_name = this.getValueFromForm(this.outputForm, 'model_path');
-            const min_pred = this.getValueFromForm(this.outputForm, 'min_proba');
-            const oc_targets = [];
-            for (const element of this.doctypesFormControl){oc_targets.push(element.value);}
+        if (this.isValidForm(this.modelForm)) {
+            const model_name = this.getValueFromForm(this.modelForm, 'model_path');
+            const min_pred = this.getValueFromForm(this.modelForm, 'min_proba');
+            const doctypes = [];
+            for (let i=0; i < this.len; i++){
+                const oc_targets = this.doctypesFormControl[i].value;
+                const fold = this.documents[i].folder;
+                const formid = this.formsFormControl[i].value;
+                doctypes.push({folder:fold, doctype:oc_targets, form:formid});
+            }
             if (this.modelId !== undefined) {
-                this.http.post(environment['url'] + '/ws/artificial_intelligence/update/' + this.modelId, {var1: model_name, var2:min_pred, var3: oc_targets}, {headers: this.authService.headers}).pipe(
+                this.http.post(environment['url'] + '/ws/artificial_intelligence/update/' + this.modelId, {var1: model_name, var2:min_pred, var3: doctypes}, {headers: this.authService.headers}).pipe(
                     tap(() => {
                         this.notify.success(this.translate.instant('ARTIFICIAL-INTELLIGENCE.model_updated'));
                         this.historyService.addHistory('splitter', 'update_model', this.translate.instant('HISTORY-DESC.update-model', {model: model_name}));
@@ -208,11 +211,11 @@ export class UpdateModelComponent implements OnInit {
     onFormSelect(event: any, index: number){
         const val = event.value;
         for (const element of this.forms) {
-            if (element.label === val) {
+            if (element.id === val) {
                 this.chosenForm[index]=element.id;
                 this.chosenDocs[index]=this.doc_types.filter((a: { formId: number }) => a.formId === this.chosenForm[index]);
             }
         }
-        this.doctypesFormControl[index].value = this.chosenDocs[index][0].label;
+        this.doctypesFormControl[index].value = this.chosenDocs[index][0].id;
     }
 }

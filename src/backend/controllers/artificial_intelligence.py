@@ -17,6 +17,7 @@
 
 import pickle
 import time
+import json
 from pathlib import Path
 import numpy as np
 import pandas as pd
@@ -69,7 +70,6 @@ def create_model(data):
     _columns = {
         'model_path': data['model_path'],
         'type': data['type'],
-        'doc_types': data['doc_types'] if 'doc_types' in data else None,
         'status': data['status'],
     }
 
@@ -100,6 +100,12 @@ def update_model(args):
 
 
 def launch_train(data, model_name):
+    """
+    Preparing the model training with data treatment and creation of a new row in the ai_models table
+    :param data: The data gathered from the front, containing doctypes info and min_pred argument
+    :param model_name: The name of model
+    :return: N/A
+    """
     custom_id = retrieve_custom_from_url(request)
     _vars = create_classes_from_custom_id(custom_id)
     _doc_servers = _vars[9]
@@ -111,8 +117,6 @@ def launch_train(data, model_name):
         folders.append(element["folder"])
         target.append(element["doctype"])
     min_pred = data["min_pred"]
-    folders_list = ", ".join(folders)
-    target_list = ", ".join(target)
 
     path = _doc_servers.get('TRAIN_PATH_FILES')
     csv_file = _doc_servers.get('TRAIN_CSV_PATH')
@@ -122,7 +126,6 @@ def launch_train(data, model_name):
     args = {'model_path': model_name.split("/")[-1],
             'type': 'doctype',
             'status': 'training',
-            'doc_types': folders_list,
             }
     model_id = create_model(args)[0].get('id')
 
@@ -134,7 +137,7 @@ def launch_train(data, model_name):
 
     args = {'set': {
         'train_time': int(t2),
-        'target': target_list if len(target_list) != 0 else "",
+        'documents': json.dumps(data["docs"]),
         'min_proba': min_pred if min_pred is not None else ""},
         'model_id': model_id,
     }
@@ -217,6 +220,7 @@ def add_train_text_to_csv(file_path, csv_file, chosen_files, model_id):
                     ".pdf"]  # Formats accepted for OCR
     total_files = 0
     count = 0
+    # Count total train files number to calculate later progression percentage
     for dir_name in os.listdir(file_path):
         if dir_name in chosen_files:
             count += len([file_name for file_name in os.listdir(file_path + "/" + dir_name) if
@@ -235,13 +239,18 @@ def add_train_text_to_csv(file_path, csv_file, chosen_files, model_id):
                     i += 1
                     total_files += 1
                     if file_name.lower().endswith('.pdf'):
+                        # pdf conversion
                         _files.jpg_name = _doc_servers.get('TMP_PATH') + Path(_files.normalize(file_name)).stem + '.jpg'
                         _files.pdf_to_jpg(file_path + "/" + dir_name + "/" + file_name, open_img=False)
                         filtered_image = _files.adjust_image(_files.jpg_name)
                     else:
+                        # Image processing
                         filtered_image = _files.adjust_image(file_path + "/" + dir_name + "/" + file_name)
-                    text = _ocr.text_builder(filtered_image)
+                        # ocr
+                    text = _ocr.text_builder(filtered_image).lower()
+                    # word cleaning
                     clean_words = word_cleaning(text)
+                    # stemming
                     text_stem = stemming(clean_words)
                     line = [file_name, text_stem, dir_name]
                     rows.append(line)
@@ -381,6 +390,12 @@ def model_testing(model, csv_file):
 
 
 def store_one_file(file_path, csv_file):
+    """
+    Use ocr on a single file and store results in a csv file
+    :param file_path: path of the file we need to read
+    :param csv_file: path of csv file which will get the data
+    :return: N/A
+    """
     custom_id = retrieve_custom_from_url(request)
     _vars = create_classes_from_custom_id(custom_id)
     _files = _vars[3]
@@ -396,7 +411,7 @@ def store_one_file(file_path, csv_file):
     else:
         _files.jpg_name = _doc_servers.get('TMP_PATH') + Path(_files.jpg_name).stem + '-1.jpg'
         filtered_image = _files.adjust_image(_files.jpg_name)
-    text = _ocr.text_builder(filtered_image)
+    text = _ocr.text_builder(filtered_image).lower()
     clean_words = word_cleaning(text)
     text_stem = stemming(clean_words)
     line = [os.path.basename(file_path), text_stem]
@@ -406,15 +421,13 @@ def store_one_file(file_path, csv_file):
     add_to_csv(csv_file, rows)
 
 
-def split_data(data):
-    folders = []
-    for folder in data:
-        folders.append(folder)
-    folders_list = ", ".join(folders)
-    return folders_list
-
-
 def rename_model(new_name, model_id):
+    """
+    Rename model .sav file when database name is updated from front
+    :param new_name: New name for our model
+    :param model_id: unique model's database id
+    :return: N/A
+    """
     custom_id = retrieve_custom_from_url(request)
     _vars = create_classes_from_custom_id(custom_id)
     _doc_servers = _vars[9]

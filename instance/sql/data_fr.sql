@@ -63,6 +63,9 @@ INSERT INTO "docservers" ("docserver_id", "description", "path") VALUES ('SPLITT
 INSERT INTO "docservers" ("docserver_id", "description", "path") VALUES ('SPLITTER_ORIGINAL_PDF', '[SPLITTER] Chemin vers le dossier contenant les PDF originaux', '/var/docservers/opencapture/splitter/original_pdf/');
 INSERT INTO "docservers" ("docserver_id", "description", "path") VALUES ('SPLITTER_METHODS_PATH', '[SPLITTER] Chemin vers le dossier contenant les différents scripts de séparation', '/var/www/html/opencapture/bin/scripts/splitter_methods/');
 INSERT INTO "docservers" ("docserver_id", "description", "path") VALUES ('SPLITTER_METADATA_PATH', '[SPLITTER] Chemin vers le dossier contenant les différents scripts de récupération de métadonnées', '/var/www/html/opencapture/bin/scripts/splitter_metadata/');
+INSERT INTO "docservers" ("description", "docserver_id", "path") VALUES ('Chemin vers le dossier contenant les données d''entraînement', 'TRAIN_PATH_FILES', '/var/www/html/opencapture/bin/scripts/artificial_intelligence/train_data');
+INSERT INTO "docservers" ("description", "docserver_id", "path") VALUES ('Chemin vers le dossier contenant le fichier csv utilisé pour l''apprentissage', 'TRAIN_CSV_PATH', '/var/www/html/opencapture/bin/scripts/artificial_intelligence/train_data/data.csv');
+INSERT INTO "docservers" ("description", "docserver_id", "path") VALUES ('Chemin vers le dossier contenant le modèle de prédiction', 'AI_MODEL_PATH', '/var/www/html/opencapture/bin/scripts/artificial_intelligence/models/');
 
 -- CRÉATION DES CHAINES SORTANTES DU MODULE VERIFIER
 INSERT INTO "outputs_types" ("id", "output_type_id", "output_type_label", "module", "data") VALUES (1, 'export_xml', 'Export XML', 'verifier', '{

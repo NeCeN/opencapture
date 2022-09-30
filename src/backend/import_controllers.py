@@ -110,7 +110,7 @@ elif 'controllers' in custom_array['doctypes']['path']:
     inputs = getattr(__import__(custom_array['doctypes']['path'], fromlist=[custom_array['doctypes']['module']]), custom_array['doctypes']['module'])
 
 if 'artificial_intelligence' or 'controllers' not in custom_array['artificial_intelligence']['path']:
-    from .controllers import doctypes
+    from .controllers import artificial_intelligence
 elif 'controllers' in custom_array['artificial_intelligence']['path']:
     inputs = getattr(__import__(custom_array['artificial_intelligence']['path'], fromlist=[custom_array['artificial_intelligence']['module']]), custom_array['artificial_intelligence']['module'])
 

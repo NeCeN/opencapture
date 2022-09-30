@@ -84,6 +84,10 @@
                 <h3>{{ 'ARTIFICIAL-INTELLIGENCE.model_list' | translate }}</h3>
                 <hr class="border-green-400">
             </div>
+            <button mat-icon-button (click)="sidenav2.toggle();"
+                    class="absolute right-2 top-2">
+                <i [class.transform]="sidenav2.opened" [class.rotate-180]="sidenav2.opened" class="fa-solid fa-stream text-xl text-gray-900"></i>
+            </button>
         </div>
         <div *ngIf="this.total > 0">
             <mat-table [dataSource]="modelsList" matSort (matSortChange)="sortData($event)" class="w-full">
@@ -107,9 +111,9 @@
                     <mat-header-cell mat-sort-header *matHeaderCellDef> {{ 'ARTIFICIAL-INTELLIGENCE.accuracy' | translate }} </mat-header-cell>
                     <mat-cell *matCellDef="let element"> {{ element.accuracy_score}} </mat-cell>
                 </ng-container>
-                <ng-container matColumnDef="doc_types">
+                <ng-container matColumnDef="documents">
                     <mat-header-cell mat-sort-header *matHeaderCellDef> {{ 'ARTIFICIAL-INTELLIGENCE.dcotypes' | translate }} </mat-header-cell>
-                    <mat-cell *matCellDef="let element"> {{ element.doc_types }} </mat-cell>
+                    <mat-cell *matCellDef="let element"> {{ element.documents}} </mat-cell>
                 </ng-container>
                 <ng-container matColumnDef="min_proba">
                     <mat-header-cell mat-sort-header *matHeaderCellDef> {{ 'ARTIFICIAL-INTELLIGENCE.min_proba' | translate }} </mat-header-cell>
@@ -133,7 +137,7 @@
                     </mat-cell>
                 </ng-container>
                 <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-                <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selectRow(row)"
+                <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selectRow(row);sidenav2.open()"
                          class="cursor-pointer hover:text-green-400 hover:shadow-md transition-colors duration-300">
                 </mat-row>
             </mat-table>
@@ -147,7 +151,7 @@
         </div>
         <h3 *ngIf="this.total === 0" class="text-center font-bold py-3">{{ 'ARTIFICIAL-INTELLIGENCE.no_model_to_display' | translate }}</h3>
     </mat-sidenav-content>
-    <mat-sidenav #sidenav2 mode="side" opened position="end" class="available-fields w-1/4 flex flex-col h-full border-r border-green-400">
+    <mat-sidenav #sidenav2 mode="side" position="end" class="available-fields w-1/4 flex flex-col h-full border-r border-green-400">
         <h3 class="bg-green-400 bg-opacity-60 text-center text-gray-900 m-0 pb-4" style="padding-top: 0.9rem">
             {{ 'ARTIFICIAL-INTELLIGENCE.test_model' | translate }}
         </h3>

@@ -543,7 +543,6 @@ class Files:
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # Image in grayscale
         blur = cv2.bilateralFilter(gray, 5, 75, 75)  # Blurring filter on gray image
         (thresh, blackAndWhiteImage) = cv2.threshold(blur, 127, 255, cv2.THRESH_BINARY)  # Image in black and white
-        cv2.imwrite("/home/edissyum/image à lire.jpg", blackAndWhiteImage)
         return blackAndWhiteImage
 
 

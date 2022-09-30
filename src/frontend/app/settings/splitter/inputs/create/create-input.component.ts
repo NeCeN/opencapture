@@ -64,6 +64,14 @@ export class SplitterCreateInputComponent implements OnInit {
             values: [],
         },
         {
+            id: 'ai_model',
+            label: this.translate.instant('ARTIFICIAL-INTELLIGENCE.model_name'),
+            type: 'select',
+            control: new FormControl(),
+            required: true,
+            values: [],
+        },
+        {
             id: 'remove_blank_pages',
             label: this.translate.instant('INPUT.remove_blank_pages'),
             type: 'boolean',
@@ -141,6 +149,24 @@ export class SplitterCreateInputComponent implements OnInit {
                 ).subscribe();
             }
         });
+        this.http.get(environment['url'] + '/ws/artificial_intelligence/getAIModels', {headers: this.authService.headers}).pipe(
+            tap((models: any) => {
+                this.inputForm.forEach((element: any) => {
+                    if (element.id === 'ai_model') {
+                        element.values = models.models;
+                        if (models.models.length === 1) {
+                            element.control.setValue(models.models[0].model_path);
+                        }
+                    }
+                });
+            }),
+            finalize(() => this.loading = false),
+            catchError((err: any) => {
+                console.debug(err);
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     isValidForm() {

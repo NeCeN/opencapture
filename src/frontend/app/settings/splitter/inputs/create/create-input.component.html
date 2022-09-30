@@ -104,6 +104,9 @@
                                 <span *ngIf="option['name']">
                                     {{ option['name'] | translate }}
                                 </span>
+                                <span *ngIf="option['model_path']">
+                                    {{ option['model_path'] | translate }}
+                                </span>
                             </mat-option>
                         </mat-select>
                         <mat-error *ngIf="field.control.invalid">{{ getErrorMessage(field.id) }}</mat-error>
